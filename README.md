@@ -41,7 +41,7 @@ After installation, on your admin portal kindly do the following:
 * On the `WooCommerce Expresspay Gateway` setup page, go through and fill out your merchant details and make amends where you see fit.
 * After the above is complete, head to the `General` tab on the same page.
 * Scroll to the `Currency options` section and set `Ghana Cedi (GHS)` as your main currency.
-* Now visit your site, add some items to your cart and checkout using (expressPay)[https://www.expresspaygh.com]
+* Now visit your site, add some items to your cart and checkout using [expressPay](https://www.expresspaygh.com)
 * All done!
 
 -------------------
