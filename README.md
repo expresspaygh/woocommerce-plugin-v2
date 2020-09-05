@@ -29,7 +29,7 @@ A simple plugin based on woocommerce for Wordpress integrators, this plugin work
 After installation, on your admin portal kindly do the following:
 
 * Head to `Plugins` -> `Add New` -> `Upload Plugin`.
-* From the root of this project you will find a compressed file `woocommerce-plugin-v2.zip`, download if you already haven't and upload the file.
+* From the root of this project you will find a compressed file `woocommerce-expresspay-plugin-v2.zip`, download if you already haven't and upload the file.
 * After upload is complete, goto `Plugins` -> `Installed Plugins`
 * Look through the list for `WooCommerce Expresspay Gateway`, click on `Activate`.
 * After activation is complete, click on `Configure`, this takes you to the WooCommerce settings page.
