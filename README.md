@@ -18,7 +18,7 @@ A simple plugin based on woocommerce for Wordpress integrators, this plugin work
 
 # Install
 
-* Install wordpress for your enviroment - (Wordpress)[https://wordpress.org/download/]
+* Install wordpress for your enviroment - [Wordpress](https://wordpress.org/download/)
 * Install woocommerce for your enviroment - (WooCommerce)[https://wordpress.org/plugins/woocommerce/]
 * Activate both `WooCommerce` and `WooCommerce Services`
 
