@@ -1,0 +1,9 @@
+docker-compose.yml
+.dockerignore
+Makefile
+expresspay-widget-plugin
+nginx-conf
+.gitignore
+expresspay-widget-plugin.zip
+README.md
+LICENSE

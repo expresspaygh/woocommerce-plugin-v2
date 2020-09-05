@@ -1,0 +1,39 @@
+## logs: Tail general logs for all running docker compose containers
+logs:
+	@echo "=============viewing all logs============="
+	docker-compose logs -f
+
+## down: Shutdown docker compose running containers
+down:
+	@echo "=============shutting down all running containers============="
+	docker-compose down
+
+## clean: Clean up after shutdown and remove all dummy images and volumes
+clean:
+	@echo "=============project cleaning up============="
+	docker system prune -f
+	docker volume prune -f
+	sudo rm -rf wordpress
+
+## run: Boot up docker compose containers in daemon mode
+daemon:
+	@echo "=============run docker compose============="
+	docker-compose up -d
+
+## run-dev: Boot up docker compose containers in developer mode
+run-dev:
+	@echo "=============run docker compose in developer mode============"
+	docker-compose up
+
+## view: Show all running containers for the app
+view:
+	@echo "=============view all running containers for app============"
+	docker-compose ps
+
+## help: Command to view help
+help: Makefile
+	@echo
+	@echo "Choose a command to run in Wordpress Widget:"
+	@echo
+	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
+	@echo
