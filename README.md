@@ -19,7 +19,7 @@ A simple plugin based on woocommerce for Wordpress integrators, this plugin work
 # Install
 
 * Install wordpress for your enviroment - [Wordpress](https://wordpress.org/download/)
-* Install woocommerce for your enviroment - (WooCommerce)[https://wordpress.org/plugins/woocommerce/]
+* Install woocommerce for your enviroment - [WooCommerce](https://wordpress.org/plugins/woocommerce/)
 * Activate both `WooCommerce` and `WooCommerce Services`
 
 ------------------
@@ -48,7 +48,7 @@ After installation, on your admin portal kindly do the following:
 
 # Demo
 
-* Install docker for your environment - (Docker)[https://www.docker.com/get-started]
+* Install docker for your environment - [Docker](https://www.docker.com/get-started)
 * Clone this repository to your environment
 * Head to your preferred terminal and change directory into the root of this project
 * Run `make run-dev` to boot and run in log mode
@@ -58,4 +58,4 @@ After installation, on your admin portal kindly do the following:
 
 ----------------------
 
-Copyright 2020, All rights reserved. Expresspay Ghana Limited [https://expresspaygh.com]
+Copyright 2020, All rights reserved. [Expresspay Ghana Limited](https://expresspaygh.com)
