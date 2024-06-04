@@ -17,7 +17,7 @@ final class Expresspay_Gateway_Blocks extends AbstractPaymentMethodType {
     }
 
     public function get_payment_method_script_handles() {
-
+        $script_version = '2.0';
         wp_register_script(
             'expresspay_gateway-blocks-integration',
             plugin_dir_url(__FILE__) . 'checkout.js',
@@ -28,7 +28,7 @@ final class Expresspay_Gateway_Blocks extends AbstractPaymentMethodType {
                 'wp-html-entities',
                 'wp-i18n',
             ],
-            null,
+            $script_version,
             true
         );
         if( function_exists( 'wp_set_script_translations' ) ) {            
