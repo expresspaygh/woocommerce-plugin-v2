@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name: Expresspay WooCommerce Gateway
+ * Plugin Name: ExpressPay Gateway for WooCommerce
  * Plugin URI: https://github.com/expresspaygh/woocommerce-plugin-v2
  * Description: Provides an option to receives payments via the expressPay merchant api.
  * Author: expressPay Ghana Limited
  * Author URI: https://www.expresspaygh.com
  * Version: 3.0.0
- * Text Domain: wc-gateway-expresspay
+ * Text Domain: expressPay-gateway-for-woocommerce
  * Domain Path: /i18n/languages/
  *
  * Copyright: (c) 2015-2024 expressPay Ghana Limited. (info@expresspaygh.com) and WooCommerce
@@ -14,7 +14,7 @@
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  *
- * @package   WC-Gateway-Expresspay
+ * @package   WC-Gateway-ExpressPay
  * @author    expressPay Ghana Limited
  * @category  Admin
  * @copyright Copyright (c) 2015-2024 expressPay Ghana Limited. and WooCommerce
@@ -23,7 +23,7 @@
  * WC requires at least: 6.0
  * WC tested up to: 8.4
  *
- * This Expresspay Gateway allows option to receives payments via expressPay's merchant api.
+ * This ExpressPay Gateway allows option to receive payments via expressPay's merchant api.
  */
 
  // Make sure WooCommerce is active
@@ -86,11 +86,9 @@ add_filter('woocommerce_currencies', 'add_expresspay_currencies');
  * @return string $currency_symbol all currencies plus our custom one
  */
 function add_expresspay_currencies_symbol($currency_symbol, $currency) {
-  switch ($currency) {
-		case 'GHS':
-			$currency_symbol = 'GHS ';
-			break;
-  }
+    if ($currency == 'GHS') {
+        $currency_symbol = 'GHS ';
+    }
   return $currency_symbol;
 }
 add_filter('woocommerce_currency_symbol', 'add_expresspay_currencies_symbol', 10, 2);
@@ -140,4 +138,3 @@ function register_payment_method_type() {
         }
     );
 }
-?>
