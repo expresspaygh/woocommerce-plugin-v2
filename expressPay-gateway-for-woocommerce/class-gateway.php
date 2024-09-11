@@ -1,5 +1,9 @@
 <?php
 
+	if ( ! function_exists( 'wp_json_encode' ) ) {
+		require_once( ABSPATH . 'wp-includes/functions.php' );
+	}
+
     class Expresspay_Gateway extends WC_Payment_Gateway {
     	/**
 		 * Constructor for the gateway.
@@ -179,16 +183,24 @@
 		 * @param  mixed $submitParams
 		 * @return array
 		 */
-		public function handle_expresspay_submit($submitParams)
-		{
-			$cURLConnection = curl_init($this->merchant_api_url . "submit.php");
-			curl_setopt($cURLConnection, CURLOPT_POSTFIELDS, $submitParams);
-			curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
-			$apiResponse = curl_exec($cURLConnection);
-			curl_close($cURLConnection);
-		
-			return json_decode($apiResponse, true);
-		}
+        public function handle_expresspay_submit($submitParams) {
+            $url = $this->merchant_api_url . "submit.php";
+            $args = [
+                'method' => 'POST',
+                'body' => $submitParams,
+                'timeout' => 15,
+            ];
+
+            $response = wp_remote_post($url, $args);
+
+            if (is_wp_error($response)) {
+                $error_message = $response->get_error_message();
+				$this->report_error($error_message);
+            } else {
+                $apiResponse = wp_remote_retrieve_body($response);
+                return json_decode($apiResponse, true);
+            }
+        }
 
         /**
 		 * handle_expresspay_checkout
@@ -241,7 +253,7 @@
 
 			$query = $this->handle_expresspay_query($queryParams);
 			if (!empty($query)):
-				$this->session_handler->set('expresspay_query_response', json_encode($query));
+				$this->session_handler->set('expresspay_query_response', wp_json_encode($query));
 			else:
 				$this->handle_expresspay_error(12);
 			endif;
@@ -253,15 +265,23 @@
 		 * @param  string $token
 		 * @return array
 		 */
-		public function handle_expresspay_query($queryParams)
-		{
-			$cURLConnection = curl_init($this->merchant_api_url . "query.php");
-			curl_setopt($cURLConnection, CURLOPT_POSTFIELDS, $queryParams);
-			curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
-			$apiResponse = curl_exec($cURLConnection);
-			curl_close($cURLConnection);
-		
-			return json_decode($apiResponse, true);
+		public function handle_expresspay_query($queryParams) {
+			$url = $this->merchant_api_url . "query.php";
+			$args = [
+				'method' => 'POST', 
+				'body' => $queryParams, 
+				'timeout' => 15,
+			];
+
+			$response = wp_remote_post($url, $args);
+
+			if (is_wp_error($response)) {
+				$error_message = $response->get_error_message();
+				$this->report_error($error_message);
+			} else {
+				$apiResponse = wp_remote_retrieve_body($response);
+				return json_decode($apiResponse, true);
+			}
 		}
 
     	/**
@@ -285,6 +305,14 @@
          */
         public function echo_expresspay_query($order_id)
         {
+
+			//check if response already echoed on thank you page
+			static $alreadyEchoed = false;
+
+        	if ($alreadyEchoed) {
+            return;
+        	}
+
             try {
                 
                 $order = wc_get_order( $order_id );
@@ -301,12 +329,15 @@
 
                 $detailHeader = "expressPay details";                
                 $detailResultText = (isset($details['result-text'])) ? $details['result-text'] : "";
-                $detailPaymentOption = (isset($details['payment_option'])) ? $details['payment_option'] : "";
+                $detailTransactionID = (isset($details['transaction-id'])) ? $details['transaction-id'] : "";
                 $detailAmount = (isset($details['amount'])) ? $details['amount'] : "";
+                $detailPaymentOption = (isset($details['payment_option'])) ? $details['payment_option'] : "";
 
                 
 
                 include(dirname(__FILE__) . '/expresspay-thankyou-element.php');
+
+				 $alreadyEchoed = true;
 
             } catch (Exception $e) {
                 $this->report_error($e->getMessage(), 'error');
