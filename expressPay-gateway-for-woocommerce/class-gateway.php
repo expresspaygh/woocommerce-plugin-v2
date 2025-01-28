@@ -64,6 +64,16 @@
 			'default' => __('Pay with expressPay', 'wc-gateway-expresspay'),
 			'desc_tip' => true,
 			),
+			'image_url' => array(
+            'title' => __('Image URL', 'wc-gateway-expresspay'),
+            'type' => 'text',
+            'description' => __('Payment Method Image.', 'wc-gateway-expresspay'),
+            'default' => plugins_url('logo.png', __FILE__),
+            'desc_tip' => true,
+			'custom_attributes' => array(
+                'disabled' => 'disabled',
+            	),
+        	),
 			'description' => array(
 			'title' => __('Description', 'wc-gateway-expresspay'),
 			'type' => 'textarea',
@@ -100,6 +110,18 @@
 				));
 		}
 
+		public function get_title()
+		{
+			$title = parent::get_title();
+			$image_url = $this->get_option('image_url');
+
+			if (!empty($image_url)) {
+				$title .= sprintf(' <img src="%s" alt="%s" style="max-height: 20px; margin-left: 10px; margin-top: 5px;">', esc_url($image_url), esc_attr__('ExpressPay Logo', 'wc-gateway-expresspay'));
+			}
+
+			return $title;
+		}
+
 
     	/**
 		 * Process the payment and return the result
@@ -113,7 +135,7 @@
 
             $order = wc_get_order($order_id);
             $redirect_url = $this->get_return_url($order);
-            $order->update_status('processing', __('expressPay payment', 'wc-gateway-expresspay'));
+            // $order->update_status('processing', __('expressPay payment', 'wc-gateway-expresspay'));
             
             $submitParams = [
                 "merchant-id" => $this->merchant_id,
@@ -343,6 +365,97 @@
                 $this->report_error($e->getMessage(), 'error');
             }
         }
+
+		/**
+		 * handle_expresspay_callback
+		 *
+		 * @return void
+		 */
+		public function handle_expresspay_callback()
+		{
+			$state = "";
+			$debugBag = array();
+			$logPrefix = "[Oops!] ::: ";
+
+			if ($_SERVER['REQUEST_METHOD'] !== "POST"):
+				$this->woo_logger->debug($logPrefix . "Sorry, request should be post!", $this->woo_context);
+				return;
+			endif;
+
+			$token = (isset($_POST['token'])) ? $_POST['token'] : '';
+			$order_id = (isset($_POST['order-id'])) ? $_POST['order-id'] : '';
+
+			if (!empty($token) && !empty($order_id)):
+
+				$order = wc_get_order($order_id);
+				if (!$order):
+					$this->woo_logger->critical($logPrefix . "No order exist for id: $order_id", $this->woo_context);
+					return;
+				endif;
+
+				if ($order->has_status('completed')):
+					$this->woo_logger->info($logPrefix . "Order has already been completed: $order_id", $this->woo_context);
+					return;
+				elseif ($order->has_status('refunded')):
+					$this->woo_logger->info($logPrefix . "Order has already been refunded: $order_id", $this->woo_context);
+					return;
+				elseif ($order->has_status('cancelled')):
+					$this->woo_logger->info($logPrefix . "Order has already been cancelled: $order_id", $this->woo_context);
+					return;
+				endif;
+
+				$queryParams = [
+					"merchant-id" => $this->merchant_id,
+					"api-key" => $this->merchant_api_key,
+					"token" => $token
+				];
+
+				$query = $this->handle_expresspay_query($queryParams);
+				if (!empty($query)):
+					if (isset($query['result'])):
+						$status = (isset($query['result'])) ? $query['result'] : "";
+						$detailResultText = (isset($query['result-text'])) ? $query['result-text'] : "";
+						if ($status == 1):
+							$order->payment_complete();
+							$state = 'Successful result';
+							$order->add_order_note("ExpressPay Payment status is:: ".$detailResultText);
+							$order->update_status('processing', __('expressPay payment', 'wc-gateway-expresspay'));
+
+						elseif ($status == 2 || $status == 3):
+							$state = 'Declined result';
+							$order->update_status("failed");
+							$order->add_order_note("ExpressPay Payment status is:: ".$detailResultText);
+
+						elseif ($status == 4):
+							$state = 'Successful result';
+							$order->update_status("pending payment");
+							$order->add_order_note("ExpressPay Payment status is:: ".$detailResultText);
+
+						else:
+							$state = 'Failed result';
+							$order->update_status("failed");
+							$order->add_order_note("ExpressPay Payment status is:: ".$detailResultText);
+
+						endif;
+					else:
+						$state = 'Invalid request';
+					endif;
+				else:
+					$state = "Query is empty!";
+				endif;
+
+				array_push($debugBag, [
+					'state' => $state,
+					'output' => json_encode($query)
+				]);
+
+				$this->woo_logger->debug($logPrefix . "Expresspay Query debugBag: " . json_encode($debugBag), $this->woo_context);
+				return;
+			else:
+				$this->woo_logger->debug($logPrefix . "No token nor order-id found in request!", $this->woo_context);
+				return;
+			endif;
+		}
 
     
  	}
