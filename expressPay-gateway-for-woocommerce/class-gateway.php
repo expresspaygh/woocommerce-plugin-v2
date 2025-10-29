@@ -33,8 +33,8 @@
 			$this->environment = $this->get_option('environment');
 			$this->woo_context = array('source' => 'expresspay_gateway');
 			$this->merchant_api_key = $this->get_option('merchant_api_key');
-			// $this->merchant_post_url = str_replace('https:','http:',add_query_arg('wc-api', 'Expresspay_Gateway', home_url('/')));
-			$this->merchant_post_url = add_query_arg('wc-api', 'Expresspay_Gateway', home_url('/'));
+			$this->merchant_post_url = str_replace('http:','https:',add_query_arg('wc-api', 'Expresspay_Gateway', home_url('/')));
+			// $this->merchant_post_url = add_query_arg('wc-api', 'Expresspay_Gateway', home_url('/'));
 			
 			// Set api url
 			$this->set_merchant_api_url();
